@@ -1,0 +1,17 @@
+<div class="burger">
+  <nav class="navbar bg-dark">
+    <a class="navbar-brand" href="#">
+      <H1>MMO Game Article Daily</H1>
+    </a>
+    <a class="my-2 my-lg-0" href="https://github.com/aNap73/Eat-Da-Burger/blob/master/README.md">About</a>
+  </nav>
+  <div>
+    <div class="jumbotron bg-dark text-primary">
+      <h2 class="border-bottom">MMO News!</h2>
+      {{#each articles}}
+      {{> burgers/article-block}}
+      {{/each}}
+      {{#each burgers}} {{#unless DEVOURED}} {{> burgers/burger-block eaten=1}} {{/unless}} {{/each}}
+    </div>
+</div>
+</div>

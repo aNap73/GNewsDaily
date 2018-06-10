@@ -1,0 +1,61 @@
+<div class="burger">
+  <nav class="navbar bg-dark">
+    <a class="navbar-brand" href="#">
+      <H1>Ant's Great Big Burger Challenge!</H1>
+    </a>
+    <a class="my-2 my-lg-0" href="https://github.com/aNap73/Eat-Da-Burger/blob/master/README.md">About</a>
+  </nav>
+  <div>
+    <div class="jumbotron bg-dark text-primary">
+      <h2 class="border-bottom">Add a Burger to the Challenge or tell us about one you devoured recently  !</h2>
+      <form class="create-form">
+        <div class="form-group">
+          <div class="row">
+
+            <div class="col-md-2">
+              <label for="burg">Burger Description / Name:</label>
+            </div>
+            <div class="col-md-3">
+              <input type="text" id="burg" name="BURGER_NAME"></input>
+            </div>
+            <div class="col-md-2">
+<label for="devo">Challenge or Devoured?</label>
+            </div>
+            <div class="col-md-2">
+                
+              <div class="form-group">
+                
+                
+                <input type="radio" name="DEVOURED" value="0" checked>Challenge!</input>
+                <br>
+                <input type="radio" name="DEVOURED" value="1">Devoured!</input>
+              </div>
+            </div>
+            <div class="col-md-2">
+              <button class="btn btn-primary" type="submit">Add Burger</button>
+            </div>
+
+          </div>
+
+        </div>
+      </form>
+
+ </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="jumbotron bg-dark text-primary">
+      <h2 class="border-bottom">Burgers Challenged!</h2>
+
+      {{#each burgers}} {{#unless DEVOURED}} {{> burgers/burger-block eaten=1}} {{/unless}} {{/each}}
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="jumbotron bg-dark text-primary">
+      <h2 class="border-bottom">Burgers Devoured!</h2>
+      {{#each burgers}} {{#if DEVOURED}} {{> burgers/burger-block eaten=0}} {{/if}} {{/each}}
+    </div>
+  </div>
+</div>
+
+</div>

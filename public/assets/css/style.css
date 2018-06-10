@@ -1,0 +1,32 @@
+body{
+  font-family: 'Alfa Slab One';
+  font-weight: 200;
+  font-size: .7em;
+}
+.jumbotron{
+  margin: 1%;
+  padding: 3%;
+  border-radius: 2%; 
+  
+}
+.burger{
+  padding: 3%;
+  background-image: url('/assets/img/Burger.gif');
+  background-position: center;
+  background-size: contain;
+
+  background-repeat: no-repeat;
+  background-color: #6d6a5c;  
+}
+.jumbotron{
+  opacity: .8;
+}
+.row{
+  padding: 1%;
+}
+.dte{
+  font-size: .75em;
+}
+h1, h2 {
+  font-size: 1.6em;
+}
