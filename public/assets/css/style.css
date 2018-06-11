@@ -1,21 +1,68 @@
 body{
   font-family: 'Alfa Slab One';
   font-weight: 200;
-  font-size: .7em;
-}
+  
+} 
 .jumbotron{
   margin: 1%;
   padding: 3%;
-  border-radius: 2%; 
   
+  
+}
+
+.mynav {
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+  margin: 0 0 0 0;
+  padding: 0 5% 0 0;
+}
+.mnu {
+  width: 35%;
+ 
+}
+.mnuitm{
+ margin: 7% 3% 7% 3%;
+ color:#5e6a77;
+}
+
+#logoname{
+  color:#6d6a5c;
+  text-shadow: 2px 2px #007bff,
+               -2px -2px #007bff;
+  font-size: 2.5em;
+  
+
+}
+#logopic{
+  margin: -7% -7% -4% -7%;
+  padding: 25% 0 0 8%;
+  width: 117%;
+  height: 105%;
+  background-image: url('/assets/img/Mon.gif');
+  background-position: center;
+  background-size: 100%;
+
+  background-repeat: no-repeat;
+  background-color: #6d6a5c;
+}
+#Summary{
+  padding: 3%;
+ 
+}
+
+img{
+  margin: 0 1%;
+  width: 98%;
+  height: 20%;
+}
+.mnu{
+  margin-inline-end: 25%;
+
 }
 .burger{
   padding: 3%;
-  background-image: url('/assets/img/Burger.gif');
-  background-position: center;
-  background-size: contain;
-
-  background-repeat: no-repeat;
+  
   background-color: #6d6a5c;  
 }
 .jumbotron{
@@ -25,8 +72,8 @@ body{
   padding: 1%;
 }
 .dte{
-  font-size: .75em;
+  
 }
-h1, h2 {
-  font-size: 1.6em;
+ h3 {
+color: white;  
 }
