@@ -16,7 +16,7 @@ class Article {
     this.Summary = summary;
     this.Link = link;    
     this.ImgLink = imglink;
-    if(saved){
+    if(!saved){}else{
     this.Saved = {value:true}}
   }
 }
@@ -30,6 +30,21 @@ const getArticleFromArray = (res, Title,cb) => {
     }
   }
   return cb(MyArt, res);
+}
+const getOldArticles = (res, cb) => {
+  
+  mod2.Articles.find({},function(dbArt){
+    if(dbArt){
+    dbArt.forEach(function(art){
+      console.log(art);
+      let out = new Article(art.Title, art.Summary, art.Link, art.LinkImg, art);
+      arrOut.push(out);
+    });
+     
+  }
+   
+  }).then(function(){cb(res);});
+  
 }
 const getFreshArticles = (res) => {
 //get old list from db 
@@ -52,17 +67,26 @@ $("article.post").each(function(i,element){
   
   if ((!summary)||((summary!==null)&&(summary.length > 100))){
     mod2.Articles.findOne({Title:title}).populate('Notes')
-    .then(function(dbArticles) {
+    .then(function(err, dbArticles) {
       // If able to successfully find and associate all Users and Notes, send them back to the client
-     
-      let out = '';
+      let out = new Article(title, summary, link, linkimg, null);
       if(!dbArticles){
-        out = new Article(title, summary, link, linkimg, null);
+      
       }else{
-        out = dbArticles;
+        out = new Article(title, summary, link, linkimg, dbArticles);
       }
       
-      arrOut.push(out);
+      
+      let bFound = false;
+      arrOut.forEach(
+        function(art){
+          console.log(dbArticle, art);
+        }
+      );
+      if(bFound==false){
+        arrOut.push(out);
+      }
+     
     
     }).catch(function(err){
       console.log('ERR ERR ERR', err);
@@ -88,14 +112,17 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       if ((!summary)||((summary!==null)&&(summary.length > 100))){
         mod2.Articles.findOne({Title:title}).populate('Notes')
         .then(function(dbArticles) {
-          
+          console.log('ARTICLE: ', dbArticles);
           // If able to successfully find and associate all Users and Notes, send them back to the client
-          let out = '';
+          let out = {};
           if(!dbArticles){
             out = new Article(title, summary, link, linkimg, null);
           }else{
-            out = dbArticles;
-          }
+            out = new Article(title, summary, link, linkimg, dbArticles);
+          }   
+
+   
+          
           arrOut.push(out);
         
         }).catch(function(err){
@@ -227,23 +254,44 @@ router.get("/api/freshies", function(req, res) {
 });
 
 router.get("*", function(req, res) {  
+  console.log("*", arrOut.length.toString());
    if(arrOut.length<1){
-
-      getFreshArticles(res);
-    }else{
+      getOldArticles(res, getFreshArticles);      
+      return;
+    }
 
 
       arrOut.forEach(function(art,i){
+        
+        if(art.NoteIds){          
+          art.NoteIds.forEach(function(nte,j){
 
-        if(art.NodeIds){          
-          art.NodeIds.forEach(function(nte,i){
-
-            mod2.Notes.find({"_id":art.NoteIds[i]},function(err, notes){
-              console.log('NOTES===>', notes);
+            mod2.Notes.find({"_id":nte},function(err, notes){
+              if(!arrOut[i].txtNote){
+                arrOut[i].txtNote = [];
+              }
+              let bFound = false;
+              arrOut[i].txtNote.forEach(function(tNote, k){
+                console.log(tNote._id, notes[0]._id);
+                if(tNote._id.toString()===notes[0]._id.toString()){
+                    bFound=true;
+                    console.log('found');
+                     
+                    }
+              })
+              if(bFound===false){
+                arrOut[i].txtNote.push(notes[0]);
+                
+                console.log('ARTICLE: ', art._id,' NOTES IN===>', arrOut[i].txtNote);
+                
+              }
+              
+              
             })});
 
         }
         })
+       
         var artObject = {
           articles: arrOut,
           styleHomeLink: HighLight,
@@ -252,7 +300,7 @@ router.get("*", function(req, res) {
           btnSave: "style='color:white;'"}
                
         return res.render("index", artObject);
-      };
+      
     
        
         
