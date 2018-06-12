@@ -25,8 +25,11 @@ app.set("view engine", "handlebars");
 app.use(express.static("public"));
 app.use(routes);
 // Connect to the Mongo DB
-//process.env.MONGODB_URI || 
-mongoose.connect("mongodb://localhost/GNewsDaily");
+//process.env.MONGODB_URI ||
+
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/GNewsDaily";
+mongoose.Promise = Promise;
+mongoose.connect(MONGODB_URI);
 if(dbreset){
   db2.Articles.remove({}, function(){});
   db2.Notes.remove({}, function(){});}

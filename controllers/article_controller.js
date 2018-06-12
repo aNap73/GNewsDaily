@@ -138,8 +138,8 @@ request("https://www.mmorpg.com/", function(error, response, html) {
      var artObject = {
       articles: arrOut,      
       styleHomeLink: HighLight,
-      styleSavedLink: LowLight,
-      styleAboutLink: LowLight,      
+      styleSavedLink: HighLight,
+      styleAboutLink: HighLight,      
       btnSave: "style='color:white;'"};
        
     console.log('rendermain');
@@ -241,8 +241,13 @@ router.get("/api/save/:Tit", function(req,res){
 router.get("/api/clear", function(req, res) {  
   mod2.Articles.deleteMany({})
         .then(function(dbGNewsDaily) {
-          getFreshArticles(res);  
-       });
+          mod2.Notes.deleteMany({}).then(function(dbGNewsDaily) {
+            getFreshArticles(res);
+          })
+        })
+          
+            
+
   
       
 });
@@ -296,8 +301,8 @@ router.get("*", function(req, res) {
         var artObject = {
           articles: arrOut,
           styleHomeLink: HighLight,
-          styleSavedLink: LowLight,
-          styleAboutLink: LowLight,
+          styleSavedLink: HighLight,
+          styleAboutLink: HighLight,
           btnSave: "style='color:white;'"}
                
         return res.render("index", artObject);
