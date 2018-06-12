@@ -1,15 +1,4 @@
 // #### Controller setup
-
-// 1. Inside your `burger` directory, create a folder named `controllers`.
-
-// 2. In `controllers`, create the `burgers_controller.js` file.
-
-// 3. Inside the `burgers_controller.js` file, import the following:
-
-//    * Express
-//    * `burger.js`
-
-// 4. Create the `router` for the app, and export the `router` at the end of your file.
 console.log('establishing routes');
 var express = require("express");
 var router = express.Router();
@@ -17,16 +6,16 @@ var cheerio = require("cheerio");
 var request = require("request");
 var HighLight = 'style="font-weight:600; color:#007bff"';
 var LowLight = 'style="font-weight:100; color:#5e6a77"';
-//mod = require('../models/burgers');
 var mod2= require('../models_2/');
 var arrOut = [];
 class Article {
-  constructor(title, summary, link, imglink, author){
+  constructor(title, summary, link, imglink, saved){
     this.Title = title;
     this.Summary = summary;
     this.Link = link;    
     this.ImgLink = imglink;
-    this.Author = author;
+    if(saved){
+    this.Saved = {value:true}}
   }
 }
 const getArticleFromArray = (res, Title,cb) => {
@@ -41,15 +30,14 @@ const getArticleFromArray = (res, Title,cb) => {
   return cb(MyArt, res);
 }
 const getFreshArticles = (res) => {
- 
-  console.log('start');
+//get old list from db 
+console.log('start');
 arrOut.length=0;
 console.log('requestive massively');
 request("http://massivelyop.com/", function(error, response, html) {
  let $ = cheerio.load(html);
  let iEnd = 8;
-$("article.post").each(function(i,element){
-  
+$("article.post").each(function(i,element){  
   if(i<iEnd){
   let link = 'http://massivelyop.com/' + $(element).children("h2").children().attr("href");
   let title = $(element).children("h2").text();  
@@ -61,8 +49,11 @@ $("article.post").each(function(i,element){
   let linkimg = $(element).children("a").children("img").attr("src");
   
   if ((!summary)||((summary!==null)&&(summary.length > 100))){
-    let out = new Article(title, summary, link, linkimg, '');
-    arrOut.push(out);
+    mod2.Articles.findOne({Title:title},function(err, obj){
+      
+      let out = new Article(title, summary, link, linkimg, obj);
+      arrOut.push(out);
+    });
   } else {if(iEnd<25){iEnd++}};
  
   }
@@ -79,9 +70,13 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       let summary = $(element).children(".news_newspost").children("p").toString().replace(/<\/?(?!p)\w*\b[^>]*>/g, "").replace(/&#x[^\s][^\s][^\s][^\s];/g,"")
       
       let linkimg = $(element).children(".news_newspost").children("a").children("img").attr("src");
-      let out = new Article(title, summary, link, linkimg, '');
-      if (summary.length > 100){
-        arrOut.push(out);
+      
+      if ((!summary)||((summary!==null)&&(summary.length > 100))){
+        mod2.Articles.findOne({Title:title},function(err, obj){
+          console.log('obj====>', obj);
+          let out = new Article(title, summary, link, linkimg, obj);
+          arrOut.push(out);
+        });
       } else {if(iEnd<25){iEnd++}};
      
       }
@@ -102,29 +97,79 @@ request("https://www.mmorpg.com/", function(error, response, html) {
 
 
 }
-router.get("/api/save/:Tit", function(req,res){
+router.get("/api/remove/:Tit", function(req,res){
+  let title = req.params.Tit;
   if (arrOut.length===0){
     res.redirect("/");
     return;
   }
-  getArticleFromArray(res, req.params.Tit, function(Art, res){
-    console.log('SAVE ME');
-    console.log(Art);
-    mod2.Articles.create(Art)
-    .then(function(dbGNewsDaily) {
-      res.json({dbGNewsDaily});  
-   })
-  .catch(function(err) {    
-    res.json({err});
+  mod2.Articles.deleteOne({Title:title},function(err,obj){
+    let MyArt = {};
+    for (let Art of arrOut) {   
+      if(Art.Title === title){
+        Art.Saved=null;
+        break;    
+      }
+    }
+   
+    return res.redirect("/");
+  });    
   });
+ 
+router.get("/api/save/:Tit", function(req,res){
+  let title = req.params.Tit;
+  if (arrOut.length===0){
+    res.redirect("/");
+    return;
+  }
+  mod2.Articles.findOne({Title:title},function(err,obj){
+    console.log('findone obj====>', obj);
+    if(!obj){
+      getArticleFromArray(res, title, function(Art, res){
+        console.log('SAVE ME');
+        console.log(Art);
+        mod2.Articles.create(Art)
+        .then(function(dbGNewsDaily) {
+          let MyArt = {};
+          for (let Art of arrOut) {   
+            if(Art.Title === title){
+                Art.Saved={value:true};
+                break;    
+             }
+          }
+          return res.redirect("/");  
+       })
+      .catch(function(err) {    
+        res.json({err});
+      });
+      });
+    }else{
+      console.log('obj FOUND');
+      return res.redirect("/");
+    }
+    
   });
+  
   
 });
   
+router.get("/api/clear", function(req, res) {  
+  mod2.Articles.deleteMany({})
+        .then(function(dbGNewsDaily) {
+          getFreshArticles(res);  
+       });
   
+
+});
+
+router.get("/api/freshies", function(req, res) {  
   
+    getFreshArticles(res);
+  
+});
+
 router.get("*", function(req, res) {  
-  
+    console.log(arrOut);
     if(arrOut.length<1){
       getFreshArticles(res);
     }else{

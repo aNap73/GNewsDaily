@@ -8,7 +8,13 @@
     {{{Summary}}} 
     </div>
     <div>
-      <a class="btn btn-primary" style="color:white;" href="/api/save/{{Title}}" >Save</a>
+      
+      {{#if Saved}}
+      <a class="btn btn-primary" style="color:white;" href="/api/remove/{{Title}}" >Remove Saved Article</a>
+      {{else}}
+      <a class="btn btn-primary" style="color:white;" href="/api/save/{{Title}}" >Save Article</a>
+      
+      {{/if}}
     </div>
   </div>
 </div>

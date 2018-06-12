@@ -4,8 +4,7 @@ var ArticleSchema = new Schema({
   Title: String,
   Summary: String,
   Link: String,
-  ImgLink: String,
-  Author: String
+  ImgLink: String
 });
 var Articles = mongoose.model("Articles", ArticleSchema);
 
