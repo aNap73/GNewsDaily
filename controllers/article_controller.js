@@ -83,12 +83,15 @@ $("article.post").each(function(i,element){
       
       
       let bFound = false;
-      // arrOut.forEach(
-      //   function(art){
-   
-      //   }
-      // );
-      if(bFound==false){
+      arrOut.forEach(
+        function(art){
+          if(art.Title===title){
+            bFound = true;
+            
+          }
+        }
+      );
+      if(bFound===false){
         arrOut.push(out);
       }
      
@@ -127,15 +130,18 @@ request("https://www.mmorpg.com/", function(error, response, html) {
           }   
 
    
-          let bFound = false;
-          // arrOut.forEach(
-          //   function(art){
-       
-          //   }
-          // );
-          if(bFound==false){
-            arrOut.push(out);
-          }   
+      let bFound = false;
+      arrOut.forEach(
+        function(art){
+          if(art.Title===title){
+            bFound = true;
+            
+          }
+        }
+      );
+      if(bFound===false){
+        arrOut.push(out);
+      }   
          
         
         }).catch(function(err){
