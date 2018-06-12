@@ -228,28 +228,39 @@ router.get("/api/freshies", function(req, res) {
 
 router.get("*", function(req, res) {  
    if(arrOut.length<1){
+
       getFreshArticles(res);
     }else{
+
+
       arrOut.forEach(function(art,i){
-        if(art.NoteIds){
-          if(art.NoteIds.length>0){
-            mod2.Notes.findOne({"_id":art.NoteIds[i]},function(err, note){
-            });
-          }
+
+        if(art.NodeIds){          
+          art.NodeIds.forEach(function(nte,i){
+
+            mod2.Notes.find({"_id":art.NoteIds[i]},function(err, notes){
+              console.log('NOTES===>', notes);
+            })});
+
         }
-       //res.redirect("/");
-      });
-      var artObject = {
-        articles: arrOut,
-        styleHomeLink: HighLight,
-        styleSavedLink: LowLight,
-        styleAboutLink: LowLight,
-        btnSave: "style='color:white;'"
-      };        
-      return res.render("index", artObject);
+        })
+        var artObject = {
+          articles: arrOut,
+          styleHomeLink: HighLight,
+          styleSavedLink: LowLight,
+          styleAboutLink: LowLight,
+          btnSave: "style='color:white;'"}
+               
+        return res.render("index", artObject);
+      };
+    
+       
+        
+         
+      
     }
     
-});
+);
 
 
 module.exports=router;
