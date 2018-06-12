@@ -51,11 +51,23 @@ $("article.post").each(function(i,element){
   let linkimg = $(element).children("a").children("img").attr("src");
   
   if ((!summary)||((summary!==null)&&(summary.length > 100))){
-    mod2.Articles.findOne({Title:title},function(err, obj){
-      let out = new Article(title, summary, link, linkimg, obj);
-      arrOut.push(out);
+    mod2.Articles.findOne({Title:title}).populate('Notes')
+    .then(function(dbArticles) {
+      // If able to successfully find and associate all Users and Notes, send them back to the client
+      console.log(dbArticles);
+      let out = '';
+      if(!dbArticles){
+        out = new Article(title, summary, link, linkimg, null);
+      }else{
+        out = dbArticles;
+      }
       
-    })
+      arrOut.push(out);
+    
+    }).catch(function(err){
+      console.log('ERR ERR ERR', err);
+    });
+
   } else {if(iEnd<25){iEnd++}};
  
   }
@@ -74,14 +86,20 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       let linkimg = $(element).children(".news_newspost").children("a").children("img").attr("src");
       
       if ((!summary)||((summary!==null)&&(summary.length > 100))){
-        mod2.Articles.findOne({Title:title},function(err, obj){
-           
-            let out = new Article(title, summary, link, linkimg, obj);
-            arrOut.push(out);
-              
-      
-          
-          
+        mod2.Articles.findOne({Title:title}).populate('Notes')
+        .then(function(dbArticles) {
+          console.log(dbArticles);
+          // If able to successfully find and associate all Users and Notes, send them back to the client
+          let out = '';
+          if(!dbArticles){
+            out = new Article(title, summary, link, linkimg, null);
+          }else{
+            out = dbArticles;
+          }
+          arrOut.push(out);
+        
+        }).catch(function(err){
+          console.log('ERR ERR ERR', err);
         });
       } else {if(iEnd<25){iEnd++}};
      
@@ -110,8 +128,10 @@ router.post("/api/note/save/", function(req,res){
   let Note = req.body.DataNote;
   mod2.Notes.create({note:Note}).then(function(dbNote){
            mod2.Articles.findOneAndUpdate({Title:title}, 
-           { $push: {NoteIds: dbNote._id }}, { new: true });
-           return res.redirect("/");
+           { $push: {NoteIds: dbNote._id }}, { new: true }).then(function(obj){
+             console.log(obj);
+           });
+          
         });
 });
 

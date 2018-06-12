@@ -5,7 +5,7 @@ var ArticleSchema = new Schema({
   Summary: String,
   Link: String,
   ImgLink: String,
-  Notes: [{
+  NoteIds: [{
     type: Schema.Types.ObjectId,
     ref: "Notes"
   }]
