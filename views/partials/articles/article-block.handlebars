@@ -11,6 +11,17 @@
       
       {{#if Saved}}
       <a class="btn btn-primary" style="color:white;" href="/api/remove/{{Title}}" >Remove Saved Article</a>
+      <div class="row">
+      <div class="jumbotron bg-dark text-primary col-12">
+      <a id="TitleData" style="display:none">{{Title}}</a>
+      <textarea type="text" id="innote" class="mmonote">{{note}}</textarea>
+      <button class="btn btn-primary" id="btnNote" for="mmonote" style="color:white">Save</button>
+      </div>    
+      </div>
+      
+      {{#each Notes}}
+      {{> notes/note-block}}
+      {{/each}}
       {{else}}
       <a class="btn btn-primary" style="color:white;" href="/api/save/{{Title}}" >Save Article</a>
       

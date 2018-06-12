@@ -4,6 +4,8 @@ var express = require("express");
 var router = express.Router();
 var cheerio = require("cheerio");
 var request = require("request");
+
+
 var HighLight = 'style="font-weight:600; color:#007bff"';
 var LowLight = 'style="font-weight:100; color:#5e6a77"';
 var mod2= require('../models_2/');
@@ -19,7 +21,7 @@ class Article {
   }
 }
 const getArticleFromArray = (res, Title,cb) => {
-  console.log(Title);
+
   let MyArt = {};
   for (let Art of arrOut) {   
     if(Art.Title === Title){
@@ -50,10 +52,10 @@ $("article.post").each(function(i,element){
   
   if ((!summary)||((summary!==null)&&(summary.length > 100))){
     mod2.Articles.findOne({Title:title},function(err, obj){
-      
       let out = new Article(title, summary, link, linkimg, obj);
       arrOut.push(out);
-    });
+      
+    })
   } else {if(iEnd<25){iEnd++}};
  
   }
@@ -73,13 +75,18 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       
       if ((!summary)||((summary!==null)&&(summary.length > 100))){
         mod2.Articles.findOne({Title:title},function(err, obj){
-          console.log('obj====>', obj);
-          let out = new Article(title, summary, link, linkimg, obj);
-          arrOut.push(out);
+           
+            let out = new Article(title, summary, link, linkimg, obj);
+            arrOut.push(out);
+              
+      
+          
+          
         });
       } else {if(iEnd<25){iEnd++}};
      
       }
+     
      });
      //console.log('Articles---->', arrOut);
      console.log('done mmorpg');   
@@ -87,8 +94,9 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       articles: arrOut,      
       styleHomeLink: HighLight,
       styleSavedLink: LowLight,
-      styleAboutLink: LowLight,
-      btnSave: "style='color:white;'"}; 
+      styleAboutLink: LowLight,      
+      btnSave: "style='color:white;'"};
+       
     console.log('render');
     return (res.render("index", artObject));
     })
@@ -97,6 +105,19 @@ request("https://www.mmorpg.com/", function(error, response, html) {
 
 
 }
+router.post("/api/note/save/", function(req,res){
+  let title = req.body.Title;
+  let Note = req.body.DataNote;
+  mod2.Notes.create({note:Note}).then(function(dbNote){
+           mod2.Articles.findOneAndUpdate({Title:title}, 
+           { $push: {NoteIds: dbNote._id }}, { new: true });
+           return res.redirect("/");
+        });
+});
+
+  
+
+
 router.get("/api/remove/:Tit", function(req,res){
   let title = req.params.Tit;
   if (arrOut.length===0){
@@ -123,14 +144,14 @@ router.get("/api/save/:Tit", function(req,res){
     return;
   }
   mod2.Articles.findOne({Title:title},function(err,obj){
-    console.log('findone obj====>', obj);
+
     if(!obj){
       getArticleFromArray(res, title, function(Art, res){
-        console.log('SAVE ME');
-        console.log(Art);
+        console.log('SAVE ME', Art);
+        
         mod2.Articles.create(Art)
         .then(function(dbGNewsDaily) {
-          let MyArt = {};
+          
           for (let Art of arrOut) {   
             if(Art.Title === title){
                 Art.Saved={value:true};
@@ -169,8 +190,7 @@ router.get("/api/freshies", function(req, res) {
 });
 
 router.get("*", function(req, res) {  
-    console.log(arrOut);
-    if(arrOut.length<1){
+   if(arrOut.length<1){
       getFreshArticles(res);
     }else{
       var artObject = {

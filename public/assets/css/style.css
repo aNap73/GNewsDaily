@@ -9,7 +9,6 @@ body{
   
   
 }
-
 .mynav {
   position: fixed;
   width: 100%;
@@ -56,6 +55,10 @@ img{
   width: 98%;
   height: 20%;
 }
+.mmonote{
+  width:60%;
+  
+}
 .mnu{
   margin-inline-end: 25%;
 
@@ -77,3 +80,6 @@ img{
  h3 {
 color: white;  
 }
+
+
+

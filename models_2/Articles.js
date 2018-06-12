@@ -4,7 +4,11 @@ var ArticleSchema = new Schema({
   Title: String,
   Summary: String,
   Link: String,
-  ImgLink: String
+  ImgLink: String,
+  Notes: [{
+    type: Schema.Types.ObjectId,
+    ref: "Notes"
+  }]
 });
 var Articles = mongoose.model("Articles", ArticleSchema);
 

@@ -24,14 +24,12 @@ app.set("view engine", "handlebars");
 // Serve static content for the app from the "public" directory in the application directory.
 app.use(express.static("public"));
 app.use(routes);
-
-
-
-
 // Connect to the Mongo DB
 //process.env.MONGODB_URI || 
 mongoose.connect("mongodb://localhost/GNewsDaily");
-if(dbreset){db2.Articles.remove({}, function(){});}
+if(dbreset){
+  db2.Articles.remove({}, function(){});
+  db2.Notes.remove({}, function(){});}
 app.listen(PORT, function() {
     console.log("App now listening at localhost:" + PORT);
   });

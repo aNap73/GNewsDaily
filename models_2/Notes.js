@@ -4,10 +4,7 @@ var Schema = mongoose.Schema;
 
 var NotesSchema = new Schema({
   note: String,
-  articles: [{
-    type: Schema.Types.ObjectId,
-    ref: "Articles"
-  }]
+  articleId: Schema.Types.ObjectId
 });
 
 var Notes = mongoose.model("Notes", NotesSchema);
