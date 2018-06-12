@@ -38,10 +38,10 @@ const getOldArticles = (res, cb) => {
      
       
       console.log('oldrecs');
+    
       if(dbArt){
       console.log('dbArt', dbArt.length);
-      dbArt.forEach(function(art){
-        console.log('==========)',art);   
+      dbArt.forEach(function(art){        
         let out = new Article(art.Title, art.Summary, art.Link, art.ImgLink, art);
         arrOut.push(out);
       });
@@ -297,7 +297,7 @@ router.get("*", function(req, res) {
               }
               let bFound = false;
               arrOut[i].txtNote.forEach(function(tNote, k){
-                console.log(tNote._id, notes[0]._id);
+           
                 if(tNote._id.toString()===notes[0]._id.toString()){
                     bFound=true;
                     console.log('found');
@@ -307,7 +307,7 @@ router.get("*", function(req, res) {
               if(bFound===false){
                 arrOut[i].txtNote.push(notes[0]);
                 
-                console.log('ARTICLE: ', art._id,' NOTES IN===>', arrOut[i].txtNote);
+               
                 
               }
               
