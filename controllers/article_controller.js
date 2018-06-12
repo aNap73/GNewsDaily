@@ -32,24 +32,29 @@ const getArticleFromArray = (res, Title,cb) => {
   return cb(MyArt, res);
 }
 const getOldArticles = (res, cb) => {
-  
-  mod2.Articles.find({},function(dbArt){
-    if(dbArt){
-    dbArt.forEach(function(art){
-      console.log(art);
-      let out = new Article(art.Title, art.Summary, art.Link, art.LinkImg, art);
-      arrOut.push(out);
-    });
+  arrOut.length=0;
+  mod2.Articles.find({}).populate('Notes').then(
+    function(dbArt){
      
-  }
-   
-  }).then(function(){cb(res);});
+      
+      console.log('oldrecs');
+      if(dbArt){
+      console.log('dbArt', dbArt.length);
+      dbArt.forEach(function(art){
+        console.log('==========)',art);   
+        let out = new Article(art.Title, art.Summary, art.Link, art.ImgLink, art);
+        arrOut.push(out);
+      });
+       
+    }
+    cb(res);
+  });
   
 }
 const getFreshArticles = (res) => {
 //get old list from db 
 console.log('start');
-arrOut.length=0;
+
 console.log('requestive massively');
 request("http://massivelyop.com/", function(error, response, html) {
  let $ = cheerio.load(html);
@@ -78,11 +83,11 @@ $("article.post").each(function(i,element){
       
       
       let bFound = false;
-      arrOut.forEach(
-        function(art){
-          console.log(dbArticle, art);
-        }
-      );
+      // arrOut.forEach(
+      //   function(art){
+   
+      //   }
+      // );
       if(bFound==false){
         arrOut.push(out);
       }
@@ -112,7 +117,7 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       if ((!summary)||((summary!==null)&&(summary.length > 100))){
         mod2.Articles.findOne({Title:title}).populate('Notes')
         .then(function(dbArticles) {
-          console.log('ARTICLE: ', dbArticles);
+         
           // If able to successfully find and associate all Users and Notes, send them back to the client
           let out = {};
           if(!dbArticles){
@@ -122,8 +127,16 @@ request("https://www.mmorpg.com/", function(error, response, html) {
           }   
 
    
-          
-          arrOut.push(out);
+          let bFound = false;
+          // arrOut.forEach(
+          //   function(art){
+       
+          //   }
+          // );
+          if(bFound==false){
+            arrOut.push(out);
+          }   
+         
         
         }).catch(function(err){
           console.log('ERR ERR ERR', err);
@@ -153,15 +166,15 @@ request("https://www.mmorpg.com/", function(error, response, html) {
 
 router.post("/api/note/save/", function(req,res){
   let title = req.body.Title;
-  console.log('SAVEME1');  
+  
   let Note = req.body.DataNote;
-  console.log('SAVEME2');
+
   mod2.Notes.create({note:Note}).then(function(dbNote){
            mod2.Articles.findOneAndUpdate({Title:title}, 
            { $push: {NoteIds: dbNote._id }}, { new: true }).then(function(obj){
           
             
-              console.log('SAVEME3');
+
               let MyArt = {};
               let x =0;
               for (let Art of arrOut) {   
@@ -173,7 +186,7 @@ router.post("/api/note/save/", function(req,res){
                 }
                x++;
               }
-              console.log('SAVEME4');
+
               return res.redirect("/");
             
           }
@@ -242,7 +255,7 @@ router.get("/api/clear", function(req, res) {
   mod2.Articles.deleteMany({})
         .then(function(dbGNewsDaily) {
           mod2.Notes.deleteMany({}).then(function(dbGNewsDaily) {
-            getFreshArticles(res);
+            getOldArticles(res, getFreshArticles);
           })
         })
           
@@ -254,15 +267,15 @@ router.get("/api/clear", function(req, res) {
 
 router.get("/api/freshies", function(req, res) {  
   
-    getFreshArticles(res);
+  getOldArticles(res, getFreshArticles);
   
 });
 
 router.get("*", function(req, res) {  
   console.log("*", arrOut.length.toString());
    if(arrOut.length<1){
-      //getOldArticles(res, getFreshArticles);      
-      getFreshArticles(res);
+      getOldArticles(res, getFreshArticles);      
+      
       return;
     }
 
