@@ -256,7 +256,8 @@ router.get("/api/freshies", function(req, res) {
 router.get("*", function(req, res) {  
   console.log("*", arrOut.length.toString());
    if(arrOut.length<1){
-      getOldArticles(res, getFreshArticles);      
+      //getOldArticles(res, getFreshArticles);      
+      getFreshArticles(res);
       return;
     }
 
