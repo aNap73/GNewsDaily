@@ -2,11 +2,11 @@
 $(function() {
   console.log('pagejs run');
   $("#btnNote").on("click", function(event){
-    console.log($("#btnNote"));
+    console.log('click');
+    
     let title = $("#TitleData").text();
     let datanote = $("#innote").val();
-    console.log('DATANOTE', datanote);
-    console.log(title);
+    
     $("#innote").val('');
     
     // Send the POST request.

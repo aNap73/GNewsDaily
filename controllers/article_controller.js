@@ -54,7 +54,7 @@ $("article.post").each(function(i,element){
     mod2.Articles.findOne({Title:title}).populate('Notes')
     .then(function(dbArticles) {
       // If able to successfully find and associate all Users and Notes, send them back to the client
-      console.log(dbArticles);
+     
       let out = '';
       if(!dbArticles){
         out = new Article(title, summary, link, linkimg, null);
@@ -88,7 +88,7 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       if ((!summary)||((summary!==null)&&(summary.length > 100))){
         mod2.Articles.findOne({Title:title}).populate('Notes')
         .then(function(dbArticles) {
-          console.log(dbArticles);
+          
           // If able to successfully find and associate all Users and Notes, send them back to the client
           let out = '';
           if(!dbArticles){
@@ -115,24 +115,45 @@ request("https://www.mmorpg.com/", function(error, response, html) {
       styleAboutLink: LowLight,      
       btnSave: "style='color:white;'"};
        
-    console.log('render');
-    return (res.render("index", artObject));
+    console.log('rendermain');
+    return res.render("index", artObject);
     })
 
 }) 
 
 
 }
+
 router.post("/api/note/save/", function(req,res){
   let title = req.body.Title;
+  console.log('SAVEME1');  
   let Note = req.body.DataNote;
+  console.log('SAVEME2');
   mod2.Notes.create({note:Note}).then(function(dbNote){
            mod2.Articles.findOneAndUpdate({Title:title}, 
            { $push: {NoteIds: dbNote._id }}, { new: true }).then(function(obj){
-             console.log(obj);
-           });
           
-        });
+            
+              console.log('SAVEME3');
+              let MyArt = {};
+              let x =0;
+              for (let Art of arrOut) {   
+                
+                if(Art.Title === title){
+                  obj.Saved = {value:true};
+                  arrOut[x]=obj;
+                  break;    
+                }
+               x++;
+              }
+              console.log('SAVEME4');
+              return res.redirect("/");
+            
+          }
+          );
+                    
+      
+                  });
 });
 
   
@@ -141,8 +162,7 @@ router.post("/api/note/save/", function(req,res){
 router.get("/api/remove/:Tit", function(req,res){
   let title = req.params.Tit;
   if (arrOut.length===0){
-    res.redirect("/");
-    return;
+    return res.redirect("/");
   }
   mod2.Articles.deleteOne({Title:title},function(err,obj){
     let MyArt = {};
@@ -152,8 +172,7 @@ router.get("/api/remove/:Tit", function(req,res){
         break;    
       }
     }
-   
-    return res.redirect("/");
+        return res.redirect("/");
   });    
   });
  
@@ -167,31 +186,29 @@ router.get("/api/save/:Tit", function(req,res){
 
     if(!obj){
       getArticleFromArray(res, title, function(Art, res){
-        console.log('SAVE ME', Art);
-        
         mod2.Articles.create(Art)
         .then(function(dbGNewsDaily) {
-          
+          let x =0;
           for (let Art of arrOut) {   
             if(Art.Title === title){
-                Art.Saved={value:true};
-                break;    
+              Art.Saved={value:true};  
+              arrOut[x] = Art;                
+              break;    
              }
+             x++;
           }
-          return res.redirect("/");  
+          return res.redirect("/");
        })
       .catch(function(err) {    
         res.json({err});
       });
-      });
-    }else{
-      console.log('obj FOUND');
-      return res.redirect("/");
-    }
-    
-  });
-  
-  
+    });
+  }else{
+    console.log('obj FOUND');
+    return res.redirect("/");
+  }
+});  
+     
 });
   
 router.get("/api/clear", function(req, res) {  
@@ -200,7 +217,7 @@ router.get("/api/clear", function(req, res) {
           getFreshArticles(res);  
        });
   
-
+      
 });
 
 router.get("/api/freshies", function(req, res) {  
@@ -213,21 +230,27 @@ router.get("*", function(req, res) {
    if(arrOut.length<1){
       getFreshArticles(res);
     }else{
+      arrOut.forEach(function(art,i){
+        if(art.NoteIds){
+          if(art.NoteIds.length>0){
+            mod2.Notes.findOne({"_id":art.NoteIds[i]},function(err, note){
+            });
+          }
+        }
+       //res.redirect("/");
+      });
       var artObject = {
         articles: arrOut,
         styleHomeLink: HighLight,
         styleSavedLink: LowLight,
         styleAboutLink: LowLight,
         btnSave: "style='color:white;'"
-      }; 
-      return (res.render("index", artObject));
+      };        
+      return res.render("index", artObject);
     }
+    
 });
 
 
 module.exports=router;
-
-
-
-
 
