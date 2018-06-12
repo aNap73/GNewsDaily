@@ -34,13 +34,13 @@ const getArticleFromArray = (res, Title,cb) => {
 const getOldArticles = (res, cb) => {
   arrOut.length=0;
   mod2.Articles.find({}).populate('Notes').then(
-    function(dbArt){
+    function( dbArt){
      
       
       console.log('oldrecs');
-    
+      console.log('dbArt===============)',dbArt);
       if(dbArt){
-      console.log('dbArt', dbArt.length);
+      
       dbArt.forEach(function(art){        
         let out = new Article(art.Title, art.Summary, art.Link, art.ImgLink, art);
         arrOut.push(out);
